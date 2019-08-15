@@ -1,114 +1,122 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow
- */
+import React, { Component } from 'react';
+import { Container, Header, Body, Content, Form, Item, Input, Picker, Title, Button, View, Row } from 'native-base';
+import { StyleSheet, Text, Alert } from 'react-native';
+import { ColorPicker, toHsv } from 'react-native-color-picker'
+export default class FormExample extends Component {
+  constructor(...args) {
+    super(...args)
+  }
+  state = {
+    name: undefined,
+    email: undefined,
+    color: undefined,
+    gender: undefined,
+  }
+  onValueChangeDD = (value) => {
 
-import React, {Fragment} from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+    this.setState({
+      gender: value
+    });
+  }
+  onPressSubmit = () => {
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+    if (this.state.name && this.state.email && this.state.gender && this.state.color) {
+      var josnObjTosent = {
+        name: this.state.name,
+        email: this.state.email,
+        gender: this.state.gender,
+        color: this.state.color
+      }
+      fetch('http://192.168.0.117:8000/formData', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(josnObjTosent),
+      }).then((res) => {
+        Alert.alert("Response came need to de json");
+      }).catch(function (error) {
+        console.log('There has been a problem with your fetch operation: ' + error.message);
+        // ADD THIS THROW error
+        throw error;
+      });
+    } else {
+      Alert.alert("Please Fill All the Fields \nBefore Submitting!");
+    }
+  };
+  render() {
+    return (
+      <Container>
+        <Header>
+          <Body>
+            <Title>Form Submission</Title>
+          </Body>
+        </Header>
+        <Content>
+          <Form style={styles.formContainer}>
+            <Item>
+              <Input placeholder="Full Name" onChangeText={(text) => this.setState({ name: text })} />
+            </Item>
+            <Item>
+              <Input placeholder="Emial" onChangeText={(text) => this.setState({ email: text })} />
+            </Item>
+            <Item picker>
+              <Picker
+                mode="dropdown"
+                placeholder="Select Your Gender"
+                placeholderStyle={styles.DDstyle}
+                selectedValue={this.state.gender}
+                onValueChange={this.onValueChangeDD.bind(this)}
+              >
+                <Picker.Item label="Male" value="m" />
+                <Picker.Item label="Female" value="f" />
+              </Picker>
+            </Item>
+            <Item>
+              <ColorPicker
+                onColorSelected={color => this.setState({ color: color })}
+                style={{ flex: 1, width: 300, height: 300 }}
+              />
+            </Item>
+            <View style={styles.btnSubmitContainer}>
+              <Item>
+                <View style={styles.btnSubmit}>
+                  <Button light style={{ alignSelf: 'center' }} onPress={this.onPressSubmit} >
+                    <Text>Submit Data</Text>
+                  </Button>
+                </View>
+              </Item>
+            </View>
+          </Form>
+        </Content>
+      </Container>
 
-const App = () => {
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  );
-};
+    );
+  }
 
+
+}
+// outside class
 const styles = StyleSheet.create({
-  scrollView: {
-    backgroundColor: Colors.lighter,
+  formContainer: {
+    padding: 10
   },
-  engine: {
-    position: 'absolute',
-    right: 0,
+  mainContainer: {
+    padding: 10
   },
-  body: {
-    backgroundColor: Colors.white,
+  btnSubmitContainer: {
+    flex: 1,
+    flexDirection: "row",
+    alignContent: "center"
   },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  btnSubmit: {
+    alignSelf: "center",
+    width: 400,
+    height: 50,
+    marginTop: 5
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: Colors.black,
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-    color: Colors.dark,
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-  footer: {
-    color: Colors.dark,
-    fontSize: 12,
-    fontWeight: '600',
-    padding: 4,
-    paddingRight: 12,
-    textAlign: 'right',
-  },
-});
+  DDstyle: {
+    width: 100,
 
-export default App;
+  }
+});

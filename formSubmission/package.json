@@ -10,7 +10,8 @@
   "dependencies": {
     "native-base": "^2.13.4",
     "react": "16.8.6",
-    "react-native": "0.60.4"
+    "react-native": "0.60.4",
+    "react-native-color-picker": "^0.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
